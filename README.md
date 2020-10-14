@@ -1,16 +1,31 @@
-<img src="https://github.com/ozgurgunes/Sketch-Homebrew/blob/master/assets/icon.png?raw=true" alt="Sketch Homebrew" width="128" align="right" />
+# Sketch Plugin Analytics
 
-# Homebrew  [![Download Latest][image]][link]
-
-[image]: https://img.shields.io/github/release/ozgurgunes/Sketch-Homebrew.svg?label=Download
-[link]: https://github.com/ozgurgunes/Sketch-Homebrew/releases/latest/download/homebrew.sketchplugin.zip
-
-A collection of Sketch utilities.
+Google Analytics module for Sketch plugins. Respects user privacy, asks for allow to tracking statistics.
 
 ## Installation
 
-[Download][link] the latest release, unzip and double click on the .sketchplugin file.
+```bash
+npm i @ozgurgunes/sketch-plugin-analytics
+```
 
-## Contribute
+## Usage
 
-Feel free.
+```javascript
+import analytics from '@ozgurgunes/sketch-plugin-analytics'
+
+var eventLabel = 'My Event'
+var eventValue = 1
+var trackingId = 'UA-1234-1'
+
+analytics(eventLabel, eventValue, trackingId)
+```
+
+### Collects:
+
+- Hit Type: `event`
+- Data Source: `Sketch Version`
+- Application Name: `Plugin Name`
+- Application Version: `Plugin Version`
+- Application ID: `Plugin Identifier`
+- Event Category: `Plugin Name`
+- Event Action: `Command Name`

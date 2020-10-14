@@ -1,6 +1,6 @@
 {
   "name": "@ozgurgunes/sketch-plugin-analytics",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Google Analytics tracker for Sketch plugins.",
   "main": "index.js",
   "scripts": {
