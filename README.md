@@ -32,27 +32,28 @@ analytics(eventLabel, eventValue, trackingID, options)
 analytics()
 
 // or any options in the JSON could be overridden like;
-anlytics(null, null, 'UA-123456-1', { eventCategory: 'Category Override' })
+analytics(null, null, 'UA-123456-1', { eventCategory: 'Category Override' })
 
 // or;
-anlytics(null, null, null, {
+analytics(null, null, null, {
   eventLabel: 'Event Label Override',
   trackingID: 'UA-123456-1'
 })
 
 // even;
-anlytics('This will be used', null, null, {
+analytics('This will be used', null, null, {
   eventLabel: 'This will not be used!'
 })
 ```
 
-## Configuration File
+## Configuration
 
-It looks for an `analytics.json` file in the `Resources` folder of the plugin. All options can be overridden by passing parameters to the module.
+It looks for an `analytics.json` file in the `Resources` folder of the plugin. All settings can be overridden by passing parameters.
 
-> ⚠️ Do not forget to pass the `trackingID` to the module or set in the JSON file. Otherwise, my ID used as default :)
+Settings which ends with `()` or includes `().` will be evaluated.
 
 ### Example JSON
+
 ```json
 {
   "trackingID": "UA-123456-1",
@@ -64,27 +65,51 @@ It looks for an `analytics.json` file in the `Resources` folder of the plugin. A
   "applicationVersion": "1.0.0",
   "applicationID": "com.example.my-sketch-plugin",
   "dataSource": "Sketch",
-  "allowDialogTitle": "Allow Google Analytics",
-  "allowDialogMessage": "Please allow My Sketch Plugin to use Google Analytics for tracking statistics."
+  "dialogTitle": "Allow Google Analytics",
+  "dialogMessage": "Please allow My Sketch Plugin to use Google Analytics for tracking statistics."
 }
 ```
 
-<a name="module_Module"></a>
+## Modules
 
-## Module
-Sends data to Google Analytics if allowed. Asks user to allow for tracking statistics, if not allowed before.
+* [sketch-plugin-analytics](#module_sketch-plugin-analytics)
 
+## Typedefs
+
+* [options](#options) : <code>Object</code>
+
+<a name="module_sketch-plugin-analytics"></a>
+
+## sketch-plugin-analytics
+Sends data to Google Analytics if allowed. Asks user to allow for tracking
+statistics, if not allowed before.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| [eventLabel] | <code>string</code> | Specifies the event label. |
-| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. |
-| [trackingID] | <code>string</code> | The measurement ID / web property ID |
-| [options] | <code>Object</code> | Options to be passed to the module. |
-| [options.eventAction] | <code>string</code> | Specifies the event action. Default is                                       the running command name of the                                       plugin. |
-| [options.eventCategory] | <code>string</code> | Specifies the event category. Default                                         is the name of the plugin. |
-| [options.dataSource] | <code>string</code> | Indicates the data source of the hit.                                      Default is Sketch version. |
-| [options.applicationName] | <code>string</code> | Specifies the application name.                                           Default is the name of the plugin. |
-| [options.applicationVersion] | <code>string</code> | Specifies the application                                              version. Default is the version                                              of the plugin. |
-| [options.applicationID] | <code>string</code> | Application identifier. Default is                                         the identifier of the plugin. |
+| [eventLabel] | <code>string</code> | Specifies the event label. Default: `null` |
+| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. Default: `null` |
+| [trackingID] | <code>string</code> | The measurement ID / web property ID. Default: `null` |
+| [options] | <code>Object</code> | Options to pass. Default: `{}` |
+
+<a name="options"></a>
+
+## options : <code>Object</code>
+Options to pass to the function.
+
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| [eventLabel] | <code>string</code> | Specifies the event label. Default: `null` |
+| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. Default: `null` |
+| [trackingID] | <code>string</code> | The measurement ID / web property ID. Default: `null` |
+| [eventAction] | <code>string</code> | Specifies the event action. Default: `context.command.name()` |
+| [eventCategory] | <code>string</code> | Specifies the event category. Default: `context.plugin.name()` |
+| [dataSource] | <code>string</code> | Indicates the data source of the hit. Default: `'Sketch ' + MSApplicationMetadata.metadata().appVersion` |
+| [applicationName] | <code>string</code> | Specifies the application name. Default: `context.plugin.name()` |
+| [applicationVersion] | <code>string</code> | Specifies the application version. Default: `context.plugin.version()` |
+| [applicationID] | <code>string</code> | Application identifier. Default: `context.plugin.identifier()` |
+| [dialogTitle] | <code>string</code> | GDPR dialog title. Default: `'Allow Google Analytics'` |
+| [dialogMessage] | <code>string</code> | GDPR dialog message. Default: `'Please allow ' + context.plugin.name() + ' plugin to use Google Analytics for tracking statistics.'` |
 

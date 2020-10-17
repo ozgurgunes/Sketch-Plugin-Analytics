@@ -1,53 +1,52 @@
 import { settingForKey, setSettingForKey } from 'sketch/settings'
 
-try {
-  var path = context.plugin.urlForResourceNamed('analytics.json').path()
-  var json = JSON.parse(
-    NSString.stringWithContentsOfFile_encoding_error(
-      path,
-      NSUTF8StringEncoding,
-      nil
-    )
-  )
-} catch (error) {
-  console.log(error)
-}
-if (!json) {
-  json = {}
-}
-
-var allowDialogTitle = json.allowDialogTitle || 'Allow Google Analytics'
-var allowDialogMessage =
-  json.allowDialogMessage ||
-  'Please allow ' +
-    context.plugin.name() +
-    ' plugin to use Google Analytics for tracking statistics.'
+/**
+ * Options to pass to the function.
+ *
+ * @typedef {Object} options
+ * @property {string} [eventLabel] Specifies the event label. Default: `null`
+ * @property {number} [eventValue] Specifies the event value. Must be
+ *     non-negative. Default: `null`
+ * @property {string} [trackingID] The measurement ID / web property ID.
+ *     Default: `null`
+ * @property {string} [eventAction] Specifies the event action. Default:
+ *     `context.command.name()`
+ * @property {string} [eventCategory] Specifies the event category. Default:
+ *     `context.plugin.name()`
+ * @property {string} [dataSource] Indicates the data source of the hit.
+ *     Default: `'Sketch ' + MSApplicationMetadata.metadata().appVersion`
+ * @property {string} [applicationName] Specifies the application name. Default:
+ *     `context.plugin.name()`
+ * @property {string} [applicationVersion] Specifies the application version.
+ *     Default: `context.plugin.version()`
+ * @property {string} [applicationID] Application identifier. Default:
+ *     `context.plugin.identifier()`
+ * @property {string} [dialogTitle] GDPR dialog title. Default: `'Allow Google
+ *     Analytics'`
+ * @property {string} [dialogMessage] GDPR dialog message. Default: `'Please
+ *     allow ' + context.plugin.name() + ' plugin to use Google Analytics for
+ *     tracking statistics.'`
+ */
 
 /**
- * @description Sends data to Google Analytics if allowed. Asks user to allow
- *              for tracking statistics, if not allowed before.
+ * Sends data to Google Analytics if allowed. Asks user to allow for tracking
+ * statistics, if not allowed before.
  *
- * @module Module
- * @param {string} [eventLabel] Specifies the event label.
+ * @param {string} [eventLabel] Specifies the event label. Default: `null`
  * @param {number} [eventValue] Specifies the event value. Must be non-negative.
- * @param {string} [trackingID] The measurement ID / web property ID
- * @param {Object} [options] Options to be passed to the module.
- * @param {string} [options.eventAction] Specifies the event action. Default is
- *                                       the running command name of the
- *                                       plugin.
- * @param {string} [options.eventCategory] Specifies the event category. Default
- *                                         is the name of the plugin.
- * @param {string} [options.dataSource] Indicates the data source of the hit.
- *                                      Default is Sketch version.
- * @param {string} [options.applicationName] Specifies the application name.
- *                                           Default is the name of the plugin.
- * @param {string} [options.applicationVersion] Specifies the application
- *                                              version. Default is the version
- *                                              of the plugin.
- * @param {string} [options.applicationID] Application identifier. Default is
- *                                         the identifier of the plugin.
+ *     Default: `null`
+ * @param {string} [trackingID] The measurement ID / web property ID. Default:
+ *     `null`
+ * @param {Object} [options] Options to pass. Default: `{}`
+ * @module sketch-plugin-analytics
  */
 export default function(eventLabel, eventValue, trackingID, options = {}) {
+  let config = getConfig(eventLabel, eventValue, trackingID, options)
+
+  if (!/(UA|YT|MO)-\d+-\d+/i.test(config.trackingID)) {
+    return console.log('Tracking ID is invalid or not set. Aborting hit.')
+  }
+
   let analyticsAllowed = settingForKey('analyticsAllowed') || false
 
   if (analyticsAllowed != true) {
@@ -55,8 +54,8 @@ export default function(eventLabel, eventValue, trackingID, options = {}) {
     if (context.plugin.alertIcon()) {
       dialog.icon = context.plugin.alertIcon()
     }
-    dialog.setMessageText(allowDialogTitle)
-    dialog.setInformativeText(allowDialogMessage)
+    dialog.setMessageText(config.dialogTitle)
+    dialog.setInformativeText(config.dialogMessage)
     dialog.addButtonWithTitle('Allow')
     dialog.addButtonWithTitle('Disallow')
     let response = dialog.runModal()
@@ -67,83 +66,102 @@ export default function(eventLabel, eventValue, trackingID, options = {}) {
   }
 
   if (analyticsAllowed) {
-    return analytics(eventLabel, eventValue, trackingID, options)
+    let uuidKey = 'google.analytics.uuid'
+    let uuid = NSUserDefaults.standardUserDefaults().objectForKey(uuidKey)
+    if (!uuid) {
+      uuid = NSUUID.UUID().UUIDString()
+      NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, uuidKey)
+      NSUserDefaults.standardUserDefaults().synchronize()
+    }
+
+    let payload = {
+      v: 1,
+      cid: uuid,
+      t: 'event',
+      tid: config.trackingID,
+      ds: config.dataSource,
+      an: config.applicationName,
+      aid: config.applicationID,
+      av: config.applicationVersion,
+      ec: config.eventCategory,
+      ea: config.eventAction
+    }
+    if (config.eventLabel) {
+      payload.el = config.eventLabel
+    }
+    if (config.eventValue) {
+      payload.ev = config.eventValue
+    }
+    sendData(payload)
   }
 }
 
-function analytics(eventLabel, eventValue, trackingID, options = {}) {
-  let uuidKey = 'google.analytics.uuid'
-  let uuid = NSUserDefaults.standardUserDefaults().objectForKey(uuidKey)
-  if (!uuid) {
-    uuid = NSUUID.UUID().UUIDString()
-    NSUserDefaults.standardUserDefaults().setObject_forKey(uuid, uuidKey)
-    NSUserDefaults.standardUserDefaults().synchronize()
-  }
-
-  let payload = {
-    v: 1,
-    cid: uuid,
-    t: 'event',
-    tid: trackingID
-      ? trackingID
-      : options.trackingID
-      ? options.trackingID
-      : json.trackingID
-      ? json.trackingID
-      : 'UA-5738625-2',
-    ds: options.dataSource
-      ? options.dataSource
-      : json.dataSource
-      ? json.dataSource
-      : 'Sketch ' + MSApplicationMetadata.metadata().appVersion,
-    an: options.applicationName
-      ? options.applicationName
-      : json.applicationName
-      ? json.applicationName
-      : context.plugin.name(),
-    aid: options.applicationID
-      ? options.applicationID
-      : json.applicationID
-      ? json.applicationID
-      : context.plugin.identifier(),
-    av: options.applicationVersion
-      ? options.applicationVersion
-      : json.applicationVersion
-      ? json.applicationVersion
-      : context.plugin.version(),
-    ec: options.eventCategory
-      ? options.eventCategory
-      : json.eventCategory
-      ? json.eventCategory
-      : context.plugin.name(),
-    ea: options.eventAction
-      ? options.eventAction
-      : json.eventAction
-      ? json.eventAction
-      : context.command.name()
-  }
-  let el = eventLabel || options.eventLabel || json.eventLabel
-  let ev = eventValue || options.eventValue || json.eventValue
-  if (el) {
-    payload.el = el
-  }
-  if (ev) {
-    payload.ev = ev
-  }
-
-  console.log(payload)
-
-  let url = NSURL.URLWithString(
-    NSString.stringWithFormat(
-      'https://www.google-analytics.com/collect%@',
-      jsonToQueryString(payload)
+function getConfig(eventLabel, eventValue, trackingID, options) {
+  let json = {}
+  try {
+    json = JSON.parse(
+      NSString.stringWithContentsOfFile_encoding_error(
+        context.plugin.urlForResourceNamed('analytics.json').path(),
+        NSUTF8StringEncoding,
+        nil
+      )
     )
-  )
+  } catch (error) {
+    console.log(error)
+  }
 
-  if (url) {
+  for (var key in json) {
+    if (json[key].endsWith('()') || json[key].includes('().')) {
+      json[key] = eval(json[key])
+    }
+  }
+
+  return {
+    trackingID: trackingID || options.trackingID || json.trackingID,
+    dataSource:
+      options.dataSource ||
+      json.dataSource ||
+      'Sketch ' + MSApplicationMetadata.metadata().appVersion,
+    applicationName:
+      options.applicationName || json.applicationName || context.plugin.name(),
+    applicationID:
+      options.applicationID ||
+      json.applicationID ||
+      context.plugin.identifier(),
+    applicationVersion:
+      options.applicationVersion ||
+      json.applicationVersion ||
+      context.plugin.version(),
+    eventCategory:
+      options.eventCategory || json.eventCategory || context.plugin.name(),
+    eventAction:
+      options.eventAction || json.eventAction || context.command.name(),
+    eventLabel: eventLabel || options.eventLabel || json.eventLabel,
+    eventValue: eventValue || options.eventValue || json.eventValue,
+    dialogTitle:
+      options.dialogTitle || json.dialogTitle || 'Allow Google Analytics',
+    dialogMessage:
+      options.dialogMessage ||
+      json.dialogMessage ||
+      'Please allow ' +
+        context.plugin.name() +
+        ' plugin to use Google Analytics for tracking statistics.'
+  }
+}
+
+function sendData(payload) {
+  try {
+    let url = NSURL.URLWithString(
+      NSString.stringWithFormat(
+        'https://www.google-analytics.com/collect%@',
+        jsonToQueryString(payload)
+      )
+    )
     NSURLSession.sharedSession()
       .dataTaskWithURL(url)
       .resume()
+  } catch (error) {
+    console.log(error)
   }
 }
 
