@@ -84,12 +84,13 @@ Settings which ends with `()` or includes `().` will be evaluated.
 Sends data to Google Analytics if allowed. Asks user to allow for tracking
 statistics, if not allowed before.
 
+
 | Param | Type | Description |
 | --- | --- | --- |
-| [eventLabel] | <code>string</code> | Specifies the event label. Default: `null` |
-| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. Default: `null` |
-| [trackingID] | <code>string</code> | The measurement ID / web property ID. Default: `null` |
-| [options] | <code>Object</code> | Options to pass. Default: `{}` |
+| [eventLabel] | <code>string</code> | Specifies the event label. |
+| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. |
+| [trackingID] | <code>string</code> | The measurement ID / web property ID. Default: |
+| [options] | <code>Object</code> | Options to pass. Default is `{}` |
 
 <a name="options"></a>
 
@@ -101,15 +102,16 @@ Options to pass to the function.
 
 | Name | Type | Description |
 | --- | --- | --- |
-| [eventLabel] | <code>string</code> | Specifies the event label. Default: `null` |
-| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. Default: `null` |
-| [trackingID] | <code>string</code> | The measurement ID / web property ID. Default: `null` |
-| [eventAction] | <code>string</code> | Specifies the event action. Default: `context.command.name()` |
-| [eventCategory] | <code>string</code> | Specifies the event category. Default: `context.plugin.name()` |
-| [dataSource] | <code>string</code> | Indicates the data source of the hit. Default: `'Sketch ' + MSApplicationMetadata.metadata().appVersion` |
-| [applicationName] | <code>string</code> | Specifies the application name. Default: `context.plugin.name()` |
-| [applicationVersion] | <code>string</code> | Specifies the application version. Default: `context.plugin.version()` |
-| [applicationID] | <code>string</code> | Application identifier. Default: `context.plugin.identifier()` |
-| [dialogTitle] | <code>string</code> | GDPR dialog title. Default: `'Allow Google Analytics'` |
-| [dialogMessage] | <code>string</code> | GDPR dialog message. Default: `'Please allow ' + context.plugin.name() + ' plugin to use Google Analytics for tracking statistics.'` |
+| [eventLabel] | <code>string</code> | Specifies the event label. |
+| [eventValue] | <code>number</code> | Specifies the event value. Must be non-negative. |
+| [trackingID] | <code>string</code> | The measurement ID / web property ID. |
+| [eventAction] | <code>string</code> | Specifies the event action. Default is `context.command.name()` |
+| [eventCategory] | <code>string</code> | Specifies the event category. Default is `context.plugin.name()` |
+| [dataSource] | <code>string</code> | Indicates the data source of the hit. Default is `'Sketch ' + MSApplicationMetadata.metadata().appVersion` |
+| [applicationName] | <code>string</code> | Specifies the application name. Default is `context.plugin.name()` |
+| [applicationVersion] | <code>string</code> | Specifies the application version. Default is `context.plugin.version()` |
+| [applicationID] | <code>string</code> | Application identifier. Default is `context.plugin.identifier()` |
+| [dialogTitle] | <code>string</code> | GDPR dialog title. Default is `'Allow Google Analytics'` |
+| [dialogMessage] | <code>string</code> | GDPR dialog message. Default is `'Please allow ' + context.plugin.name() + ' plugin to use Google Analytics for tracking statistics.'` |
+| [debug] | <code>booean</code> | Enables debugging and testing features. Default is `false`|
 

@@ -1,16 +1,20 @@
 {
     "env": {
         "es6": true,
-        "node": true
+        "node": true,
+        "jest/globals": true
     },
     "extends": [
       "eslint:recommended", 
       "prettier", 
       "sketch"],
-    "plugins": ["prettier"],
+    "plugins": ["prettier", "jest"],
     "globals": {
         "context": "readonly",
         "nil": "readonly",
+        "MOPointer": "readonly",
+        "NSURLConnection": "readonly",
+        "NSURLRequest": "readonly",
         "NSURLSession": "readonly"
     },
     "parserOptions": {

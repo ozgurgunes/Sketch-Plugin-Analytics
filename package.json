@@ -4,7 +4,7 @@
   "description": "Google Analytics module for Sketch plugins.",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "skpm-test"
   },
   "repository": {
     "type": "git",
@@ -24,12 +24,18 @@
   },
   "homepage": "https://github.com/ozgurgunes/Sketch-Plugin-Analytics#readme",
   "devDependencies": {
+    "@skpm/test-runner": "^0.4.1",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
     "eslint-config-sketch": "^0.2.4",
+    "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-prettier": "^3.1.2",
     "jsdoc-to-markdown": "^6.0.1",
     "prettier": "^1.19.1",
-    "prettier-plugin-jsdoc": "^0.2.0"
+    "prettier-plugin-jsdoc": "^0.2.0",
+    "sinon": "^9.2.0"
+  },
+  "dependencies": {
+    "@skpm/fs": "^0.2.6"
   }
 }
