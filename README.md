@@ -1,6 +1,8 @@
 # Sketch Plugin Analytics
 
-Google Analytics module for Sketch plugins. Respects user privacy. Asks user to allow for tracking statistics, if not allowed before.
+Google Analytics module for Sketch plugins. Asks user to allow for tracking statistics, if not allowed before. Sends event hit type with event label and value. 
+
+Tracking ID and options can be set in a `JSON` file in plugin's `Resources` folder and overridden by passing params to function.
 
 ## Installation
 
@@ -112,6 +114,6 @@ Options to pass to the function.
 | [applicationVersion] | <code>string</code> | Specifies the application version. Default is `context.plugin.version()` |
 | [applicationID] | <code>string</code> | Application identifier. Default is `context.plugin.identifier()` |
 | [dialogTitle] | <code>string</code> | GDPR dialog title. Default is `'Allow Google Analytics'` |
-| [dialogMessage] | <code>string</code> | GDPR dialog message. Default is `'Please allow ' + context.plugin.name() + ' plugin to use Google Analytics for tracking statistics.'` |
-| [debug] | <code>booean</code> | Enables debugging and testing features. Default is `false`|
+| [dialogMessage] | <code>string</code> | GDPR dialog message. Default is `'Please allow ' + context.plugin.name() + ' plugin send statistics and data to help improve its functionality. Data is collected anonymously and cannot be used to identify you.'` |
+| [debug] | <code>boolean</code> | Enables debugging and testing features. Default is `false`|
 

@@ -27,7 +27,7 @@ test('Should warn if tracking ID is invalid.', () => {
 })
 
 test('Should send a request if analytics is allowed.', () => {
-  setSettingForKey('analyticsAllowed', true)
+  setSettingForKey('analyticsEnabled', true)
   expect(analytics('', '', 'UA-123456-1', { debug: true }).data).toMatch(
     '"valid": true'
   )
@@ -121,8 +121,8 @@ test('Should use existing UUID.', () => {
 })
 
 test('Should show a dialog if analytics is not allowed.', () => {
-  setSettingForKey('analyticsAllowed', undefined)
-  expect(analytics('', '', 'UA-1234-5', { debug: true })).toBeInstanceOf(
+  setSettingForKey('analyticsEnabled', undefined)
+  expect(analytics('', '', 'UA-123456-1', { debug: true })).toBeInstanceOf(
     NSAlert
   )
 })

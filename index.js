@@ -24,10 +24,11 @@ import fs from '@skpm/fs'
  * @property {string} [dialogTitle] GDPR dialog title. Default is `'Allow Google
  *     Analytics'`
  * @property {string} [dialogMessage] GDPR dialog message. Default is `'Please
- *     allow ' + context.plugin.name() + ' plugin to use Google Analytics for
- *     tracking statistics.'`
- * @property {booean} [debug] Enables debugging and testing features. Default is
- *     `false`
+ *     allow ' + context.plugin.name() + ' plugin send statistics and data to help
+ *     improve its functionality. Data is collected anonymously and cannot be
+ *     used to identify you.'`
+ * @property {boolean} [debug] Enables debugging and testing features. Default
+ *     is `false`
  */
 
 /**
@@ -47,9 +48,9 @@ export default function(eventLabel, eventValue, trackingID, options = {}) {
     return console.warn('Tracking ID is invalid or not set. Aborting hit.')
   }
 
-  let analyticsAllowed = settingForKey('analyticsAllowed') || false
+  let analyticsEnabled = settingForKey('analyticsEnabled') || false
 
-  if (analyticsAllowed != true) {
+  if (analyticsEnabled != true) {
     let dialog = NSAlert.alloc().init()
     if (context.plugin.alertIcon()) {
       dialog.icon = context.plugin.alertIcon()
@@ -63,12 +64,12 @@ export default function(eventLabel, eventValue, trackingID, options = {}) {
     }
     let response = dialog.runModal()
     if (response == 1000) {
-      analyticsAllowed = true
-      setSettingForKey('analyticsAllowed', analyticsAllowed)
+      analyticsEnabled = true
+      setSettingForKey('analyticsEnabled', analyticsEnabled)
     }
   }
 
-  if (analyticsAllowed) {
+  if (analyticsEnabled) {
     let UUIDKey = 'google.analytics.uuid'
     let UUID = NSUserDefaults.standardUserDefaults().objectForKey(UUIDKey)
     if (!UUID) {
@@ -149,7 +150,8 @@ function getConfig(eventLabel, eventValue, trackingID, options) {
       json.dialogMessage ||
       'Please allow ' +
         context.plugin.name() +
-        ' plugin to use Google Analytics for tracking statistics.'
+        ' plugin send statistics and data to help improve its functionality.' +
+        ' Data is collected anonymously and can not be used to identify you.'
   }
 }
 
