@@ -27,8 +27,6 @@ import fs from '@skpm/fs'
  *     allow ' + context.plugin.name() + ' plugin send statistics and data to help
  *     improve its functionality. Data is collected anonymously and cannot be
  *     used to identify you.'`
- * @property {boolean} [debug] Enables debugging and testing features. Default
- *     is `false`
  */
 
 /**
@@ -59,10 +57,10 @@ export default function(eventLabel, eventValue, trackingID, options = {}) {
     dialog.setInformativeText(config.dialogMessage)
     dialog.addButtonWithTitle('Allow')
     dialog.addButtonWithTitle('Disallow')
-    if (options.debug) {
+    if (context.debug == true) {
       return dialog
     }
-    let response = dialog.runModal()
+    let response = context.debug ? context.debug : dialog.runModal()
     if (response == 1000) {
       analyticsEnabled = true
       setSettingForKey('analyticsEnabled', analyticsEnabled)
@@ -96,13 +94,13 @@ export default function(eventLabel, eventValue, trackingID, options = {}) {
     if (config.eventValue) {
       payload.ev = config.eventValue
     }
-    return sendData(payload, options.debug)
+    return sendData(payload)
   }
 }
 
 function getConfig(eventLabel, eventValue, trackingID, options) {
   let data
-  let file = options.debug
+  let file = context.debug
     ? { path: () => null }
     : context.plugin.urlForResourceNamed('analytics.json')
   if (file) {
@@ -121,7 +119,6 @@ function getConfig(eventLabel, eventValue, trackingID, options) {
   }
 
   return {
-    debug: options.debug || json.debug || false,
     trackingID: trackingID || options.trackingID || json.trackingID,
     dataSource:
       options.dataSource ||
@@ -155,17 +152,17 @@ function getConfig(eventLabel, eventValue, trackingID, options) {
   }
 }
 
-function sendData(payload, debug) {
+function sendData(payload) {
   try {
     let url = NSURL.URLWithString(
       NSString.stringWithFormat(
         'https://www.google-analytics.com/' +
-          (debug ? 'debug/' : '') +
+          (context.debug ? 'debug/' : '') +
           'collect%@',
         jsonToQueryString(payload)
       )
     )
-    if (debug) {
+    if (context.debug) {
       var request = NSURLRequest.requestWithURL(url)
       var response = MOPointer.alloc().init()
       var error = MOPointer.alloc().init()

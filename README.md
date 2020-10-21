@@ -115,5 +115,3 @@ Options to pass to the function.
 | [applicationID] | <code>string</code> | Application identifier. Default is `context.plugin.identifier()` |
 | [dialogTitle] | <code>string</code> | GDPR dialog title. Default is `'Allow Google Analytics'` |
 | [dialogMessage] | <code>string</code> | GDPR dialog message. Default is `'Please allow ' + context.plugin.name() + ' plugin send statistics and data to help improve its functionality. Data is collected anonymously and cannot be used to identify you.'` |
-| [debug] | <code>boolean</code> | Enables debugging and testing features. Default is `false`|
-

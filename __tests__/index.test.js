@@ -4,15 +4,17 @@ import { setSettingForKey } from 'sketch/settings'
 import sinon from 'sinon'
 
 beforeEach(() => {
+  context.debug = true
   sinon.stub(fs, 'readFileSync')
 })
 afterEach(() => {
   sinon.restore()
+  context.debug = undefined
 })
 
 test('Should warn if tracking ID is not defined.', () => {
   sinon.stub(console, 'warn')
-  analytics('', '', '', { debug: true })
+  analytics()
   expect(
     console.warn.calledWith('Tracking ID is invalid or not set. Aborting hit.')
   ).toBe(true)
@@ -20,7 +22,7 @@ test('Should warn if tracking ID is not defined.', () => {
 
 test('Should warn if tracking ID is invalid.', () => {
   sinon.stub(console, 'warn')
-  analytics('', '', 'Invalid', { debug: true })
+  analytics('', '', 'Invalid')
   expect(
     console.warn.calledWith('Tracking ID is invalid or not set. Aborting hit.')
   ).toBe(true)
@@ -28,13 +30,13 @@ test('Should warn if tracking ID is invalid.', () => {
 
 test('Should send a request if analytics is allowed.', () => {
   setSettingForKey('analyticsEnabled', true)
-  expect(analytics('', '', 'UA-123456-1', { debug: true }).data).toMatch(
+  expect(analytics('', '', 'UA-123456-1').data).toMatch(
     '"valid": true'
   )
-  expect(analytics('', '', 'UA-1234-5', { debug: true }).data).toMatch(
+  expect(analytics('', '', 'UA-1234-5').data).toMatch(
     '"messageCode": "VALUE_INVALID"'
   )
-  expect(analytics('', '', 'UA-1234-5', { debug: true }).data).toMatch(
+  expect(analytics('', '', 'UA-1234-5').data).toMatch(
     '"parameter": "tid"'
   )
 })
@@ -46,7 +48,7 @@ test('Should use JSON config.', () => {
     eventAction: 'JSON-Action'
   }
   fs.readFileSync.returns(JSON.stringify(json))
-  expect(analytics('', '', '', { debug: true }).data).toMatch('"valid": true')
+  expect(analytics('', '', '').data).toMatch('"valid": true')
   sinon.restore()
 })
 
@@ -57,7 +59,7 @@ test('Should run JSON functions.', () => {
     eventAction: 'MSApplicationMetadata.metadata().appVersion'
   }
   fs.readFileSync.returns(JSON.stringify(json))
-  let response = analytics('', '', '', { debug: true })
+  let response = analytics('', '', '')
   expect(response.data).toMatch(`ec=${context.command.name()}`)
   expect(response.data).toMatch(
     `ea=${MSApplicationMetadata.metadata().appVersion}`
@@ -74,8 +76,7 @@ test('Should use options over JSON.', () => {
   fs.readFileSync.returns(JSON.stringify(json))
   let options = {
     eventCategory: 'Options-Category',
-    eventAction: 'Options-Action',
-    debug: true
+    eventAction: 'Options-Action'
   }
   let response = analytics('', '', '', options)
   expect(response.data).toMatch('"valid": true')
@@ -88,8 +89,7 @@ test('Should use params over options.', () => {
   let options = {
     trackingID: 'invalid',
     eventLabel: 'Options-Label',
-    eventValue: 0,
-    debug: true
+    eventValue: 0
   }
   let response = analytics('Param-Label', 1, 'UA-123456-1', options)
   expect(response.data).toMatch('"valid": true')
@@ -103,7 +103,7 @@ test('Should create a UUID if not exist.', () => {
   NSUserDefaults.standardUserDefaults().removeObjectForKey(
     'google.analytics.uuid'
   )
-  let response = analytics('', '', 'UA-123456-1', { debug: true })
+  let response = analytics('', '', 'UA-123456-1')
   UUID = response.url
     .absoluteString()
     .split('cid=')[1]
@@ -112,7 +112,7 @@ test('Should create a UUID if not exist.', () => {
 })
 
 test('Should use existing UUID.', () => {
-  let response = analytics('', '', 'UA-123456-1', { debug: true })
+  let response = analytics('', '', 'UA-123456-1')
   let newUUID = response.url
     .absoluteString()
     .split('cid=')[1]
@@ -122,7 +122,20 @@ test('Should use existing UUID.', () => {
 
 test('Should show a dialog if analytics is not allowed.', () => {
   setSettingForKey('analyticsEnabled', undefined)
-  expect(analytics('', '', 'UA-123456-1', { debug: true })).toBeInstanceOf(
+  expect(analytics('', '', 'UA-123456-1')).toBeInstanceOf(
     NSAlert
   )
+})
+
+test('Should send a request if user clicked allow.', () => {
+  context.debug = 1000
+  let response = analytics('Param-Label', 1, 'UA-123456-1')
+  expect(response.data).toMatch('"valid": true')
+})
+
+test('Should not send request if user clicked disallow.', () => {
+  context.debug = 1001
+  setSettingForKey('analyticsEnabled', undefined)
+  let response = analytics('Param-Label', 1, 'UA-123456-1')
+  expect(response).toBe(undefined)
 })
