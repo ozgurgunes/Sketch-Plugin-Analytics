@@ -56,13 +56,13 @@ test('Should run JSON functions.', () => {
   let json = {
     trackingID: 'UA-123456-1',
     eventCategory: 'context.command.name()',
-    eventAction: 'MSApplicationMetadata.metadata().appVersion'
+    eventAction: 'BCSketchInfo.shared().metadata().appVersion'
   }
   fs.readFileSync.returns(JSON.stringify(json))
   let response = analytics('', '', '')
   expect(response.data).toMatch(`ec=${context.command.name()}`)
   expect(response.data).toMatch(
-    `ea=${MSApplicationMetadata.metadata().appVersion}`
+    `ea=${BCSketchInfo.shared().metadata().appVersion}`
   )
   sinon.restore()
 })

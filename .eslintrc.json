@@ -23,6 +23,9 @@
         "sourceType": "module"
     },
     "rules": {
-      "no-console": "off"
+      "no-console": "off",
+      "no-dupe-else-if": "off",
+      "no-import-assign": "off",
+      "no-setter-return": "off"
     }
 }
