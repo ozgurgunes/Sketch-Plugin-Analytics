@@ -14,7 +14,7 @@ import fs from '@skpm/fs'
  * @property {string} [eventCategory] Specifies the event category. Default is
  *     `context.plugin.name()`
  * @property {string} [dataSource] Indicates the data source of the hit. Default
- *     is `'Sketch ' + BCSketchInfo.shared.metadata().appVersion`
+ *     is `'Sketch ' + BCSketchInfo.shared().metadata().appVersion`
  * @property {string} [applicationName] Specifies the application name. Default
  *     is `context.plugin.name()`
  * @property {string} [applicationVersion] Specifies the application version.
@@ -123,7 +123,7 @@ function getConfig(eventLabel, eventValue, trackingID, options) {
     dataSource:
       options.dataSource ||
       json.dataSource ||
-      'Sketch ' + BCSketchInfo.shared.metadata().appVersion,
+      'Sketch ' + BCSketchInfo.shared().metadata().appVersion,
     applicationName:
       options.applicationName || json.applicationName || context.plugin.name(),
     applicationID:
