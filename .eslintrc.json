@@ -10,6 +10,7 @@
       "sketch"],
     "plugins": ["prettier", "jest"],
     "globals": {
+        "BCSketchInfo": "readonly",
         "context": "readonly",
         "nil": "readonly",
         "MOPointer": "readonly",
